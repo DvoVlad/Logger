@@ -99,8 +99,8 @@ class Logger{
         $mess = $mess.' Message time:'.date('Y-m-d H:i:s').'\r\n';
         echo $mess;
       }
-      break;
-	    }
+      break
+     }
    }
 }
 DB::setHost(HOST);
