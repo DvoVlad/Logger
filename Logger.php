@@ -1,13 +1,9 @@
-<?
+﻿<?
 header('Content-Type: text/html; charset= utf-8')
 define(HOST,'localhost');
 define(BASE,'logger');
 define(USER,'root');
 define(PASSWORD,'');
-DB::setHost(HOST);
-DB::setUser(USER);
-DB::setPassword(PASSWORD);
-DB::setBase(BASE);
  class DB{
 	 private static $db = null;
 	 private static $host = null;
@@ -32,7 +28,7 @@ DB::setBase(BASE);
 	 public static function setBase($base){
 		self::$base = $base;
 	 }
-	private function __construct(){
+	final private function __construct(){
 		if(isset(self::$host)&&isset(self::$user)&&isset(self::$password)&&isset(self::$base)){
 			return new mysqli(self::$host,self::$user,self::$password,self::$base);
 			if(self::$db->connect_errno){
@@ -42,7 +38,8 @@ DB::setBase(BASE);
 			exit('Настройки БД не установлены!');
 		}
 	}
- }
+	final private function __clone(){}
+}
 class Logger{
 	/**
 	Путь по умолчанию в корневом каталоге. Можно установить свой.
@@ -86,13 +83,31 @@ class Logger{
         file_put_contents($filep,$mess,FILE_APPEND);
       }elseif(is_array($mess)||is_object($mess)){
         print_r($mess,$logmess);
-        $logmess = '<pre>'.$logmess.'</pre> '.date('Y-m-d H:i:s').'\r\n';
+        $logmess = $logmess.' Message time:'.date('Y-m-d H:i:s').'\r\n';
         file_put_contents($filep,$logmess,FILE_APPEND);
       }elseif(is_string($mess)){
-        file_put_contents($filep,$logmess,FILE_APPEND);
+        $mess = $mess.' Message time:'.date('Y-m-d H:i:s').'\r\n';
+        file_put_contents($filep,$mess,FILE_APPEND);
+      }
+      break;
+      case 'stdout':
+      if($mess instanceof Exception){
+        $mess = $mess->getMessage().' Message time:'.date('Y-m-d H:i:s').'\r\n';
+        echo $mess;
+      }elseif(is_array($mess)||is_object($mess)){
+        print_r($mess,$logmess);
+        $logmess ='<pre>'.$logmess.'</pre> Message time:'.date('Y-m-d H:i:s').'\r\n';
+        echo $logmess;
+      }elseif(is_string($mess)){
+        $mess = $mess.' Message time:'.date('Y-m-d H:i:s').'\r\n';
+        echo $mess;
       }
       break;
 	    }
      }
 }
+DB::setHost(HOST);
+DB::setUser(USER);
+DB::setPassword(PASSWORD);
+DB::setBase(BASE);
 ?>
