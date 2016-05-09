@@ -41,9 +41,6 @@ define(PASSWORD,'');
 	final private function __clone(){}
 }
 class Logger{
-	/**
-	Путь по умолчанию в корневом каталоге. Можно установить свой.
-	*/
 	private static $filep = '/log.txt';
 	private static $logtype = 'MySQL';
 	public static function setFilePath($path){
@@ -104,7 +101,7 @@ class Logger{
       }
       break;
 	    }
-     }
+   }
 }
 DB::setHost(HOST);
 DB::setUser(USER);
