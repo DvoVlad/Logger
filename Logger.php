@@ -37,7 +37,8 @@ define(PASSWORD,'');
 	 }
 	final private function __construct(){
 	}
-	final private function __clone(){}
+	final private function __clone(){
+	}
 }
 class Logger{
 	private static $filep = '/log.txt';
@@ -101,4 +102,9 @@ DB::getDB();
 $mess="something";
 $logger = new Logger;
 $logger->saveMessage($mess);
+$arraymess = array('1','2','3');
+$logger->saveMessage($arraymess);
+$exception = new Exception('Exception!');
+$logger->saveMessage($exception);
+$logger->saveMessage($logger);
 ?>
