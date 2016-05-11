@@ -1,5 +1,5 @@
 ﻿<?
-header('Content-Type: text/html; charset= utf-8')
+header('Content-Type: text/html; charset= utf-8');
 define(HOST,'localhost');
 define(BASE,'logger');
 define(USER,'root');
@@ -11,8 +11,15 @@ define(PASSWORD,'');
 	 private static $password = null;
 	 private static $base = null;
 	 public static function getDB(){
-		 if(!(self::$db)){
-			self::$db = new self;
+			 if(!(self::$db)){
+				if(isset(self::$host)&&isset(self::$user)&&isset(self::$password)&&isset(self::$base)){
+					self::$db = new mysqli(self::$host,self::$user,self::$password,self::$base);
+				if(self::$db->connect_errno){
+					echo "Не удалось подключиться к MySQL: " . self::$db->connect_error;
+				}
+			}else{
+				exit('Настройки БД не установлены!');
+			}
 		 }
 		 return self::$db;
 	 }
@@ -29,14 +36,6 @@ define(PASSWORD,'');
 		self::$base = $base;
 	 }
 	final private function __construct(){
-		if(isset(self::$host)&&isset(self::$user)&&isset(self::$password)&&isset(self::$base)){
-			return new mysqli(self::$host,self::$user,self::$password,self::$base);
-			if(self::$db->connect_errno){
-				echo "Не удалось подключиться к MySQL: " . self::$db->connect_error;
-			}
-		}else{
-			exit('Настройки БД не установлены!');
-		}
 	}
 	final private function __clone(){}
 }
@@ -52,26 +51,17 @@ class Logger{
 		self::$logtype = $logtype;
 	}
 	public function saveMessage($mess){
-     switch(self:$logtype){
+     switch(self::$logtype){
       case 'MySQL':
       $db = DB::getDB();
       if($mess instanceof Exception){
         $mess = $mess->getMessage();
-        $stmt = $db->prepare("INSERT INTO `log`(`Message`)VALUES(?)");
-        $stmt->bind_param('s',$mess);
-        $stmt->execute();
-        $stmt->close();
+        $stmt = $db->query("INSERT INTO `logs`(`Message`)VALUES('".$db->real_escape_string($mess)."')");
       }elseif(is_array($mess)||is_object($mess)){
         $mess = serialize($mess);
-        $stmt = $db->prepare("INSERT INTO `log`(`Message`)VALUES(?)");
-        $stmt->bind_param('s',$mess);
-        $stmt->execute();
-        $stmt->close();
+        $stmt = $db->query("INSERT INTO `logs`(`Message`)VALUES('".$db->real_escape_string($mess)."')");
       }elseif(is_string($mess)){
-        $stmt = $db->prepare("INSERT INTO `log`(`Message`)VALUES(?)");
-        $stmt->bind_param('s',$mess);
-        $stmt->execute();
-        $stmt->close();
+        $stmt = $db->query("INSERT INTO `logs`(`Message`)VALUES('".$db->real_escape_string($mess)."')");
       }
       break;
       case 'FILE':
@@ -99,7 +89,7 @@ class Logger{
         $mess = $mess.' Message time:'.date('Y-m-d H:i:s').'\r\n';
         echo $mess;
       }
-      break
+      break;
      }
    }
 }
@@ -107,4 +97,8 @@ DB::setHost(HOST);
 DB::setUser(USER);
 DB::setPassword(PASSWORD);
 DB::setBase(BASE);
+DB::getDB();
+$mess="something";
+$logger = new Logger;
+$logger->saveMessage($mess);
 ?>
