@@ -70,7 +70,7 @@ class Logger{
         $mess = $mess->getMessage().' Message time:'.date('Y-m-d H:i:s').'\r\n';
         file_put_contents($filep,$mess,FILE_APPEND);
       }elseif(is_array($mess)||is_object($mess)){
-        print_r($mess,$logmess);
+       $logmess = print_r($mess,true);
         $logmess = $logmess.' Message time:'.date('Y-m-d H:i:s').'\r\n';
         file_put_contents($filep,$logmess,FILE_APPEND);
       }elseif(is_string($mess)){
@@ -83,7 +83,7 @@ class Logger{
         $mess = $mess->getMessage().' Message time:'.date('Y-m-d H:i:s').'\r\n';
         echo $mess;
       }elseif(is_array($mess)||is_object($mess)){
-        print_r($mess,$logmess);
+        $logmess = print_r($mess,true);
         $logmess ='<pre>'.$logmess.'</pre> Message time:'.date('Y-m-d H:i:s').'\r\n';
         echo $logmess;
       }elseif(is_string($mess)){
